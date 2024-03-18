@@ -21,24 +21,24 @@ import StatisticsCard from 'src/views/dashboard/StatisticsCard'
 import WeeklyOverview from 'src/views/dashboard/WeeklyOverview'
 import DepositWithdraw from 'src/views/dashboard/DepositWithdraw'
 import SalesByCountries from 'src/views/dashboard/SalesByCountries'
+import CardNavigationCenter from 'src/views/cards/CardNavigationCenter'
+import CardNavigationDailyLogging from 'src/views/cards/CardNavigationDailyLogging'
 
-const Dashboard = () => {
-  console.log("Dashboard.tsx")
+const Daily = () => {
+  console.log("Daily.tsx")
   return (
     <ApexChartWrapper>
       <Grid container spacing={6}>
-        <Grid item xs={12} md={4}>
+        {/* <Grid item xs={12} md={4}>
           <Trophy />
-        </Grid>
-        <Grid item xs={12} md={8}>
+        </Grid> */}
+        {/* <Grid item xs={12} md={8}>
           <StatisticsCard />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <WeeklyOverview />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <TotalEarning />
-        </Grid>
+        </Grid> */}
+        <Grid item xs={12} md={6}>
+        <CardNavigationDailyLogging />
+      </Grid>
+        
         <Grid item xs={12} md={6} lg={4}>
           <Grid container spacing={6}>
             <Grid item xs={6}>
@@ -85,18 +85,10 @@ const Dashboard = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <SalesByCountries />
-        </Grid>
-        <Grid item xs={12} md={12} lg={8}>
-          <DepositWithdraw />
-        </Grid>
-        <Grid item xs={12}>
-          <Table />
-        </Grid>
+        
       </Grid>
     </ApexChartWrapper>
   )
 }
 
-export default Dashboard
+export default Daily
