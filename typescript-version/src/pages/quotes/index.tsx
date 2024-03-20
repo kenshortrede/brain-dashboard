@@ -24,71 +24,88 @@ import SalesByCountries from 'src/views/dashboard/SalesByCountries'
 import CardNavigationCenter from 'src/views/cards/CardNavigationCenter'
 import CardNavigationDailyLogging from 'src/views/cards/CardNavigationDailyLogging'
 import { TabPanel } from '@mui/lab'
-import { Button, CardContent, Checkbox, FormControlLabel, FormGroup, Slider, TextField, Typography } from '@mui/material'
+import { Autocomplete, Chip, Button, CardContent, Checkbox, FormControlLabel, FormGroup, Slider, TextField, Typography } from '@mui/material'
+import { tagOptions } from 'src/constants/tags';
+import { useState } from 'react'
+
+// Example authors list - replace this with your dynamic list fetched from the database
+const authorsList = ['Mark Twain', 'Virginia Woolf', 'Albert Einstein', 'Maya Angelou'];
 
 const Quotes = () => {
     console.log("Daily.tsx")
 
     const handleSubmit = () => {
-        console.log("Submit")
-    }
+        console.log("Quote:", quote, "Author:", author, "Tags:", quoteTags);
+        // Handle the submission, e.g., sending data to your backend
+    };
+
+    const [quoteTags, setQuoteTags] = useState([]);
+    const [quote, setQuote] = useState('');
+    const [author, setAuthor] = useState(null); // Use null for Autocomplete's value to represent no selection
+
     return (
         <CardContent>
             <Typography variant='h6' sx={{ marginBottom: 2 }}>
                 Enter Your Favorite Quote
             </Typography>
-            <Typography gutterBottom>
-                Select Categories
-            </Typography>
-            <Grid container spacing={2}>
-                <Grid item xs={6}>
-                    <FormGroup>
-                        {[
-                            'Inspiration',
-                            'Love',
-                            'Pickup',
-                            'Life Lessons',
-                            'Motivation',
-                            'Happiness',
-                            'Mindfulness',
-                            'Personal Growth',
-                            'Resilience'
-                        ].map((type) => (
-                            <FormControlLabel control={<Checkbox />} label={type} key={type} />
-                        ))}
-                    </FormGroup>
-                </Grid>
-                <Grid item xs={6}>
-                    <FormGroup>
-                        {[
-                            'Success & Failure',
-                            'Wisdom',
-                            'Friendship',
-                            'Family',
-                            'Work & Career',
-                            'Creativity',
-                            'Nature',
-                            'Philosophy',
-                            'Others' // For quotes that don't neatly fit into the above categories
-                        ].map((type) => (
-                            <FormControlLabel control={<Checkbox />} label={type} key={type} />
-                        ))}
-                    </FormGroup>
-                </Grid>
-            </Grid>
             <TextField
-                label="Write down quote"
+                label="Quote"
                 multiline
                 rows={4}
                 variant="outlined"
                 fullWidth
-                sx={{ marginTop: 20 }}
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+                sx={{ marginBottom: 2 }}
             />
+            <Autocomplete
+                value={author}
+                onChange={(event, newValue) => {
+                    setAuthor(newValue);
+                }}
+                inputValue={author ? author : ''}
+                onInputChange={(event, newInputValue) => {
+                    setAuthor(newInputValue);
+                }}
+                freeSolo
+                options={authorsList}
+                renderInput={(params) => (
+                    <TextField {...params} label="Author" variant="outlined" fullWidth sx={{ marginBottom: 2 }} />
+                )}
+            />
+            <Typography gutterBottom>
+                Select Categories
+            </Typography>
+            <Grid item xs={12} sx={{ marginBottom: 2 }}>
+                <Autocomplete
+                    multiple
+                    id="tags-standard"
+                    options={tagOptions}
+                    freeSolo
+                    value={quoteTags}
+                    onChange={(event, newValue) => {
+                        setQuoteTags([...newValue]);
+                    }}
+                    renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                            <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                        ))
+                    }
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            variant="outlined"
+                            label="Tags"
+                            placeholder="Add Tags"
+                        />
+                    )}
+                />
+            </Grid>
             <Grid container justifyContent="flex-end">
-                <Button variant='contained' onClick={handleSubmit} sx={{ marginTop: 2 }}>Submit</Button>
+                <Button variant='contained' onClick={handleSubmit} sx={{ marginTop: 2 }}>Save</Button>
             </Grid>
         </CardContent>
-    )
-}
+    );
+};
 
-export default Quotes
+export default Quotes;

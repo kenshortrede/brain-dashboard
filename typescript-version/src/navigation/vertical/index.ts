@@ -12,7 +12,7 @@ import GoogleCirclesExtended from 'mdi-material-ui/GoogleCirclesExtended'
 
 // ** Type import
 import { VerticalNavItemsType } from 'src/@core/layouts/types'
-import { AccountEdit, Bookshelf, Pen } from 'mdi-material-ui'
+import { AccountEdit, Bookshelf, CalendarToday, NotePlusOutline, Pen } from 'mdi-material-ui'
 
 const navigation = (): VerticalNavItemsType => {
   return [
@@ -26,9 +26,13 @@ const navigation = (): VerticalNavItemsType => {
       icon: AccountCogOutline,
       path: '/account-settings'
     },
+
+    {
+      sectionTitle: 'Logging Data'
+    },
     {
       title: 'Daily Entry',
-      icon: AccountEdit,
+      icon: CalendarToday,
       path: '/logging'
     },
     {
@@ -43,9 +47,19 @@ const navigation = (): VerticalNavItemsType => {
     },
     {
       title: 'Notes',
-      icon: Bookshelf,
+      icon: NotePlusOutline,
       path: '/notes'
     },
+    
+    //------------------------------------------------------------------------------------
+    
+    // Add pages to display quotes, media, and notes that have been entered before
+    {
+      sectionTitle: 'Data'
+    },
+
+
+    //------------------------------------------------------------------------------------
     {
       sectionTitle: 'Pages'
     },

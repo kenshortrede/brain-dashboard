@@ -26,6 +26,7 @@ import { HelpCircle, MinusBox, PlusBox } from 'mdi-material-ui'
 import { LocalizationProvider, MobileTimePicker } from '@mui/lab'
 import AdapterDateFns from '@date-io/date-fns';
 import Slider from '@mui/material/Slider';
+import workoutTypes from 'src/constants/workoutTypes'
 
 
 const CardNavigationDailyLogging = () => {
@@ -72,7 +73,9 @@ const CardNavigationDailyLogging = () => {
   const [sleepTime, setSleepTime] = useState(defaultSleepTime);
 
 
-
+  const half = Math.ceil(workoutTypes.length / 2);
+  const firstHalfTypes = workoutTypes.slice(0, half);
+  const secondHalfTypes = workoutTypes.slice(half);
 
   return (
     <Card>
@@ -92,6 +95,22 @@ const CardNavigationDailyLogging = () => {
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <FormGroup>
+                  {firstHalfTypes.map((type) => (
+                    <FormControlLabel control={<Checkbox />} label={type.name} key={type.id} />
+                  ))}
+                </FormGroup>
+              </Grid>
+              <Grid item xs={6}>
+                <FormGroup>
+                  {secondHalfTypes.map((type) => (
+                    <FormControlLabel control={<Checkbox />} label={type.name} key={type.id} />
+                  ))}
+                </FormGroup>
+              </Grid>
+            </Grid>
+            {/* <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <FormGroup>
                   {['Chest', 'Biceps', 'Triceps', 'Forearms', 'Abs'].map((type) => (
                     <FormControlLabel control={<Checkbox />} label={type} key={type} />
                   ))}
@@ -104,7 +123,7 @@ const CardNavigationDailyLogging = () => {
                   ))}
                 </FormGroup>
               </Grid>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sx={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> {/* Increased space before this Grid */}
               <Typography>Workout Duration:</Typography>
