@@ -1,6 +1,6 @@
 import db from './db';
 
-export const insertSleep = async (userId: number, durationHours: number, quality: string, notes: string, dailyLogsId: number | null) => {
+export const insertSleep = async (userId: number, dailyLogsId: number | null, durationHours: number, quality: string, notes: string) => {
     const query = `
         INSERT INTO sleep (user_id, duration_hours, quality, notes, daily_logs_id)
         VALUES (?, ?, ?, ?, ?)

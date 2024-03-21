@@ -1,17 +1,20 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import db from '../../lib/db'; // Adjust the path as necessary
+import { insertWorkout, linkWorkoutAndType } from '../../lib/workoutsDB';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
     if (req.method === 'POST') {
         try {
-            const { userId, dailyLogsId, type, notes } = req.body;
-            const [result] = await db.execute(
-                'INSERT INTO workouts (user_id, daily_logs_id, type, notes) VALUES (?, ?, ?, ?)',
-                [userId, dailyLogsId, type, notes]
-            );
-            res.status(201).json({ message: 'Workout added', workoutId: result.insertId });
+            const { userId, dailyLogsId, notes, types } = req.body;
+            const workoutResult = await insertWorkout(userId, dailyLogsId, notes);
+            const workoutId = workoutResult.insertId;
+
+            // Link workout to its types
+            await Promise.all(types.map(async (typeId) => {
+                await linkWorkoutAndType(workoutId, typeId);
+            }));
+
+            res.status(201).json({ message: 'Workout created successfully', workoutId });
         } catch (error) {
-            res.status(500).json({ message: 'Error adding workout', error: error.message });
+            res.status(500).json({ message: 'Server error', error: error.message });
         }
     } else {
         res.setHeader('Allow', ['POST']);
