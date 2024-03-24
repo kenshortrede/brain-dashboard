@@ -1,7 +1,7 @@
 export interface IDailyLogEntry {
     mood: number;
     content: string;
-    workout: IWorkout;
+    workout: IWorkoutComponent; //IWorkout;
     sleep: ISleep;
     meditations: IMeditation[];
 }
@@ -33,14 +33,14 @@ export interface IMediaTag {
 }
 
 export interface IMeditation {
-    id: number;
-    user_id: number;
+    id: number | null;
+    user_id: number | null;
     title: string;
-    type: 'Goal Visualization' | 'Confidence' | 'Love' | 'Letting Go' | 'Breathing' | 'Grounding';
+    type: string;
     duration_minutes: number | null;
     notes: string | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
     daily_logs_id: number | null;
 }
 
@@ -74,13 +74,13 @@ export interface IQuoteTag {
 }
 
 export interface ISleep {
-    id: number;
-    user_id: number;
+    id: number | null;
+    user_id: number | null;
     duration_hours: number;
     quality: 'Poor' | 'Fair' | 'Good' | 'Excellent';
     notes: string | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
     daily_logs_id: number | null;
 }
 
@@ -97,13 +97,17 @@ export interface IUser {
     created_at: Date;
     updated_at: Date;
 }
-
+export interface IWorkoutComponent {
+    workout: IWorkout;
+    types: number[];
+}
 export interface IWorkout {
-    id: number;
+    id: number | null;
     user_id: number;
+    duration_minutes: number | null;
     notes: string | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
     daily_logs_id: number | null;
 }
 

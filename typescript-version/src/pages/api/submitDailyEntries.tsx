@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 // Import the necessary interfaces from dbTypes.tsx
 import { IDailyLog, IWorkout, ISleep, IMeditation, IDailyLogEntry } from '../../lib/dbTypes';
 import { insertDailyLog } from '../../lib/dailyLogsDB';
-import { insertWorkout, linkWorkoutAndType } from '../../lib/workoutsDB';
+import { insertWorkout, insertWorkoutAndLinkTypes, linkWorkoutAndType } from '../../lib/workoutsDB';
 import { insertSleep } from '../../lib/sleepDB';
 import { insertMeditation } from '../../lib/meditationsDB';
 // Import other necessary DB interaction functions
@@ -11,6 +11,7 @@ import pool from '../../lib/db';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
         const { mood, content, workout, sleep, meditations }: IDailyLogEntry = req.body;
+        console.log("mood: ", mood, "workout: ", workout, "sleep: ", sleep, "meditations: ", meditations)
 
         // Get a connection from the pool
         const connection = await pool.getConnection();
@@ -21,20 +22,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             // Insert the daily log
             const dailyLogResult = await insertDailyLog(1, content, mood);
-            const dailyLogId = dailyLogResult.id; // Assuming insertDailyLog returns an object with an insertId property
+            const dailyLogId = dailyLogResult.insertId; // Assuming insertDailyLog returns an object with an insertId property
+
 
             // Insert workout, sleep, and meditations entries using dailyLogId
             // Adjust these function calls based on your actual implementation
 
             // Insert workout
             if (workout) {
-                const workoutResult = await insertWorkout(1, dailyLogId, workout.notes ? workout.notes : '');
-                const workoutId = workoutResult.id;
-                // Link workout and its types
-                for (const typeId of workout.types) {
-                    await linkWorkoutAndType(workoutId, typeId);
-                }
+                // Assuming workout.notes is optional, provide an empty string if not present
+                const notes = workout.notes || '';
+                const actualWorkoutData = workout.workout;
+                const workoutTypes = workout.types;
+                await insertWorkoutAndLinkTypes(actualWorkoutData.user_id, dailyLogId, actualWorkoutData.notes, workoutTypes);
+                console.log("Returned successfully");
             }
+
+            // Commit the transactionF
+            // await connection.commit();
+            connection.release(); // Release the connection back to the pool
+            return;
 
             // Insert sleep
             if (sleep) {

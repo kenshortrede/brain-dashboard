@@ -16,7 +16,9 @@ export const workoutTypes: WorkoutType[] = [
     { id: 8, name: 'Swimming' },
     { id: 9, name: 'Basketball' },
     // Add other
-    { id: 10, name: 'Other' },
+    { id: 10, name: 'Football' },
+    { id: 11, name: 'Running' },
+    { id: 12, name: 'Other' },
     // Add more as needed
 ];
 
