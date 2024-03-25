@@ -2,17 +2,18 @@ import db from './db';
 
 export const insertDailyLog = async (userId: number, content: string | null, mood: number | null) => {
     try {
-        // Convert undefined values to null
-        const safeContent = content === undefined ? null : content;
-        const safeMood = mood === undefined ? null : mood;
+        // Ensure content is either null or a valid JSON string
+        // If content is an object, stringify it; if it's undefined, convert to null
+        const safeContent = content ? JSON.stringify(content) : null;
+        const safeMood = mood ? mood : null;
 
         console.log("userId: ", userId, "content: ", safeContent, "mood: ", safeMood);
+
         const query = `
-        INSERT INTO daily_logs (user_id, content, mood)
-        VALUES (?, ?, ?)
-    `;
+            INSERT INTO daily_logs (user_id, content, mood)
+            VALUES (?, ?, ?)
+        `;
         const [result] = await db.execute(query, [userId, safeContent, safeMood]);
-        console.log("result: ", result);
         return result;
     } catch (error) {
         console.log("[insertDailyLog] error: ", error);

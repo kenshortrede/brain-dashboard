@@ -3,22 +3,19 @@ import db from './db';
 
 // Assuming insertWorkout returns the ID of the newly inserted workout,
 // and you've adjusted it to do so if necessary.
-export const insertWorkoutAndLinkTypes = async (userId: number, dailyLogsId: number, notes: string | null, workoutTypeIds: number[]) => {
+export const insertWorkoutAndLinkTypes = async (userId: number, dailyLogsId: number, notes: string | null, workoutTypeIds: number[], duration: number | null) => {
   try {
-    // Start a transaction
-    await db.beginTransaction();
+    console.log('Inserting workout and linking types: ', userId, dailyLogsId, notes, workoutTypeIds, duration);
 
     // Insert the workout and get its ID
-    const workoutResult = await insertWorkout(userId, dailyLogsId, notes);
+    const workoutResult = await insertWorkout(userId, dailyLogsId, notes, duration);
     const workoutId = workoutResult.insertId; // Make sure insertWorkout returns this
-
+    console.log("Inserted workout: ", workoutId);
     // Link each workout type with the newly created workout
     for (const workoutTypeId of workoutTypeIds) {
       await linkWorkoutAndType(workoutId, workoutTypeId);
+      console.log("Linked workout and type:", workoutId, workoutTypeId);
     }
-
-    // Commit the transaction
-    await db.commit();
 
     return { success: true, workoutId };
   } catch (error) {
@@ -29,13 +26,13 @@ export const insertWorkoutAndLinkTypes = async (userId: number, dailyLogsId: num
   }
 };
 
-export const insertWorkout = async (userId: number, dailyLogsId: number, notes: string | null) => {
+export const insertWorkout = async (userId: number, dailyLogsId: number, notes: string | null, duration: number | null) => {
   try {
     const query = `
-    INSERT INTO workouts (user_id, daily_logs_id, notes)
-    VALUES (?, ?, ?)
+    INSERT INTO workouts (user_id, daily_logs_id, notes, duration_minutes)
+    VALUES (?, ?, ?, ?)
   `;
-    const [result] = await db.execute(query, [userId, dailyLogsId, notes]);
+    const [result] = await db.execute(query, [userId, dailyLogsId, notes, duration]);
     return result;
   } catch (error) {
     console.error('Failed to insert workout:', error);
@@ -80,7 +77,7 @@ export const linkWorkoutAndType = async (workoutId: number, workoutTypeId: numbe
     const [result] = await db.execute(query, [workoutId, workoutTypeId]);
     return result;
   } catch (error) {
-    console.error('Failed to link workout and type:', error);
+    console.error('[linkWorkoutAndType] Failed to link workout and type:', error);
     return null;
   }
 };

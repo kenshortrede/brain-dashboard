@@ -10,8 +10,8 @@ import pool from '../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {
-        const { mood, content, workout, sleep, meditations }: IDailyLogEntry = req.body;
-        console.log("mood: ", mood, "workout: ", workout, "sleep: ", sleep, "meditations: ", meditations)
+        const { dailyLog, workout, sleep, meditations }: IDailyLogEntry = req.body;
+        console.log("workout: ", workout, "sleep: ", sleep, "meditations: ", meditations, "dailyLog: ", dailyLog);
 
         // Get a connection from the pool
         const connection = await pool.getConnection();
@@ -19,11 +19,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
             // Start a transaction
             await connection.beginTransaction();
-
+            const user_id = dailyLog.user_id;
             // Insert the daily log
-            const dailyLogResult = await insertDailyLog(1, content, mood);
-            const dailyLogId = dailyLogResult.insertId; // Assuming insertDailyLog returns an object with an insertId property
-
+            const dailyLogResult = await insertDailyLog(user_id, dailyLog.content, dailyLog.mood);
+            const dailyLogId: number = dailyLogResult.insertId; // Assuming insertDailyLog returns an object with an insertId property
+            console.log("Returned successfully from insertDailyLog");
 
             // Insert workout, sleep, and meditations entries using dailyLogId
             // Adjust these function calls based on your actual implementation
@@ -31,27 +31,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             // Insert workout
             if (workout) {
                 // Assuming workout.notes is optional, provide an empty string if not present
-                const notes = workout.notes || '';
                 const actualWorkoutData = workout.workout;
+                const notes = actualWorkoutData.notes || '';
                 const workoutTypes = workout.types;
-                await insertWorkoutAndLinkTypes(actualWorkoutData.user_id, dailyLogId, actualWorkoutData.notes, workoutTypes);
-                console.log("Returned successfully");
+                console.log(actualWorkoutData.duration_minutes);
+                await insertWorkoutAndLinkTypes(user_id, dailyLogId, notes, workoutTypes, actualWorkoutData.duration_minutes);
+                console.log("Returned successfully from insertWorkoutAndLinkTypes");
             }
 
-            // Commit the transactionF
-            // await connection.commit();
-            connection.release(); // Release the connection back to the pool
-            return;
+
 
             // Insert sleep
             if (sleep) {
-                await insertSleep(1, dailyLogId, sleep.duration_hours, sleep.quality, sleep.notes ? sleep.notes : '');
+                await insertSleep(user_id, dailyLogId, sleep.duration_hours, sleep.quality, sleep.notes ? sleep.notes : '');
             }
+
+
 
             // Insert meditations
             if (meditations) {
+
                 for (const meditation of meditations) {
-                    await insertMeditation(1, dailyLogId, meditation.title, meditation.type, meditation.duration_minutes, meditation.notes);
+                    // await insertMeditation(user_id, dailyLogId, meditation.title, meditation.type, meditation.duration_minutes, meditation.notes);
+                    await insertMeditation(user_id, meditation.title, meditation.type, meditation.duration_minutes, meditation.notes, dailyLogId);
+                    console.log("Successfully inserted meditation: ", meditation.type);
                 }
             }
 

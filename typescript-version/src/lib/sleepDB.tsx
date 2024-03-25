@@ -1,12 +1,17 @@
 import db from './db';
 
-export const insertSleep = async (userId: number, dailyLogsId: number | null, durationHours: number, quality: string, notes: string) => {
-    const query = `
+export const insertSleep = async (userId: number | null, dailyLogsId: number | null, durationHours: number, quality: string, notes: string) => {
+    try {
+        const query = `
         INSERT INTO sleep (user_id, duration_hours, quality, notes, daily_logs_id)
         VALUES (?, ?, ?, ?, ?)
     `;
-    const [result] = await db.execute(query, [userId, durationHours, quality, notes, dailyLogsId]);
-    return result;
+        const [result] = await db.execute(query, [userId, durationHours, quality, notes, dailyLogsId]);
+        return result;
+    } catch (error) {
+        console.error('Failed to insert sleep:', error);
+        return null;
+    }
 };
 
 export const updateSleep = async (sleepId: number, updates: { durationHours?: number; quality?: string; notes?: string; dailyLogsId?: number | null }) => {

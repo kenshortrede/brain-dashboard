@@ -20,14 +20,14 @@ import FormGroup from '@mui/material/FormGroup'
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
-import { IconButton, Tooltip } from '@mui/material'
+import { Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Snackbar, Tooltip } from '@mui/material'
 import { HelpCircle, MinusBox, PlusBox } from 'mdi-material-ui'
 import { LocalizationProvider, MobileTimePicker } from '@mui/lab'
 import AdapterDateFns from '@date-io/date-fns';
 import Slider from '@mui/material/Slider';
 import workoutTypes from 'src/constants/workoutTypes'
 import axios from 'axios'; // Make sure to install axios if you haven't
-import { IDailyLogEntry, IMeditation, ISleep, IWorkout, IWorkoutComponent } from 'src/lib/dbTypes'
+import { IDailyLog, IDailyLogEntry, IMeditation, ISleep, IWorkout, IWorkoutComponent } from 'src/lib/dbTypes'
 
 
 const CardNavigationDailyLogging = () => {
@@ -74,6 +74,13 @@ const CardNavigationDailyLogging = () => {
     setTab(String(parseInt(tab) + 1))
   }
 
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogContent, setDialogContent] = useState({
+    title: '',
+    message: '',
+  });
+
   // Function to handle form submission
   // Function to handle form submission
   const handleSubmit = async () => {
@@ -117,10 +124,21 @@ const CardNavigationDailyLogging = () => {
       id: null,
     }));
 
+    const dailyLogContent = {
+      notes: additionalComments,
+    }
+    const dailyData: IDailyLog = {
+      mood: mood,
+      content: dailyLogContent,
+      user_id: user_id,
+      created_at: null,
+      updated_at: null,
+      id: null,
+    }
+
     // Create an object with the data to submit
     const dailyEntryData: IDailyLogEntry = {
-      mood: mood,
-      content: additionalComments,
+      dailyLog: dailyData,
       workout: workoutData,
       sleep: sleep,
       meditations: meditationsData,
@@ -128,6 +146,11 @@ const CardNavigationDailyLogging = () => {
 
     console.log('Submitting daily entry', dailyEntryData);
 
+    // setDialogContent({ title: 'Success', message: 'Your daily entry has been submitted successfully!' });
+    // setOpenDialog(true);
+    setDialogContent({ title: 'Error', message: 'Submission failed. Please try again.' });
+    setOpenDialog(true);
+    return;
     // Use fetch API to send a POST request to your API endpoint
     try {
       const response = await fetch('/api/submitDailyEntries', {
@@ -142,9 +165,15 @@ const CardNavigationDailyLogging = () => {
         const result = await response.json();
         console.log('Submission successful', result);
         // Handle success - maybe clear the form or show a success message
+        setDialogContent({ title: 'Success', message: 'Your daily entry has been submitted successfully!' });
+        setOpenDialog(true);
+
       } else {
         console.error('Submission failed', await response.text());
         // Handle error - show error message to the user
+        // setSnackbarMessage('Submission failed. Please try again.');
+        setDialogContent({ title: 'Error', message: 'Submission failed. Please try again.' });
+        setOpenDialog(true);
       }
     } catch (error) {
       console.error('Error submitting daily entry', error);
@@ -209,6 +238,9 @@ const CardNavigationDailyLogging = () => {
     setMeditations((currentMeditations) => currentMeditations.filter((_, i) => i !== index));
   };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   return (
     <Card>
@@ -496,6 +528,29 @@ const CardNavigationDailyLogging = () => {
               <Button variant='contained' onClick={handleSubmit} sx={{ marginTop: 2 }}>Submit</Button>
             </Grid>
           </TabPanel>
+
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{dialogContent.title}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                {dialogContent.message}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>Close</Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+            <Alert onClose={handleClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar> */}
         </CardContent>
       </TabContext>
     </Card >

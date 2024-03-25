@@ -1,18 +1,17 @@
 export interface IDailyLogEntry {
-    mood: number;
-    content: string;
+    dailyLog: IDailyLog;
     workout: IWorkoutComponent; //IWorkout;
     sleep: ISleep;
     meditations: IMeditation[];
 }
 
 export interface IDailyLog {
-    id: number;
+    id: number | null;
     user_id: number;
-    content: JSON | null;
+    content: any;
     mood: number | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
 }
 
 export interface IMedia {

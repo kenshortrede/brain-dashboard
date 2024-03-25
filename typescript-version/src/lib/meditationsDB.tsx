@@ -1,12 +1,17 @@
 import db from './db';
 
 export const insertMeditation = async (userId: number, title: string, type: string, durationMinutes: number | null, notes: string | null, dailyLogsId: number | null) => {
-    const query = `
+    try {
+        const query = `
         INSERT INTO meditations (user_id, title, type, duration_minutes, notes, daily_logs_id)
         VALUES (?, ?, ?, ?, ?, ?)
     `;
-    const [result] = await db.execute(query, [userId, title, type, durationMinutes, notes, dailyLogsId]);
-    return result;
+        const [result] = await db.execute(query, [userId, title, type, durationMinutes, notes, dailyLogsId]);
+        return result;
+    } catch (error) {
+        console.error('Failed to insert meditation:', error);
+        return null;
+    }
 };
 
 export const updateMeditation = async (meditationId: number, updates: { title?: string; type?: string; durationMinutes?: number; notes?: string; dailyLogsId?: number | null }) => {
