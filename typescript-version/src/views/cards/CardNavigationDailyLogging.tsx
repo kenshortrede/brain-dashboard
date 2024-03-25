@@ -44,6 +44,7 @@ const CardNavigationDailyLogging = () => {
   // const [workoutType, setWorkoutType] = useState<string>('Chest'); // Default workout type - 'Chest'
   // const [workoutTypesSelected, setWorkoutTypesSelected] = useState<string[]>([]);
   const [workoutTypesSelected, setWorkoutTypesSelected] = useState<number[]>([]);
+  const [workoutNotes, setWorkoutNotes] = useState<string>(''); // Additional notes for the workout
 
   // SLEEP STATES
   // Create a new Date object
@@ -54,11 +55,12 @@ const CardNavigationDailyLogging = () => {
   const [sleepTime, setSleepTime] = useState(defaultSleepTime); // Time the user went to sleep - Default 9 PM
   const [sleepDuration, setSleepDuration] = useState(8); // How many hours the user slept - Default 8 hours
   const [sleepQuality, setSleepQuality] = useState(""); // Quality of sleep - Default 'Good' ('Poor', 'Fair', 'Good', 'Excellent')
+  const [sleepNotes, setSleepNotes] = useState<string>(''); // Additional notes for the sleep
 
   // MEDITATION STATES
   const [meditationDuration, setMeditationDuration] = useState<number>(10);
   const [meditationType, setMeditationType] = useState<string>("");
-  const [meditations, setMeditations] = useState([{ type: "", duration: 10 }]);
+  const [meditations, setMeditations] = useState([{ type: "", duration: 10, notes: "" }]);
 
   // GENERAL DAILY STATES
   const [mood, setMood] = useState<number>(5); // Mood of the day - From 1 to 10
@@ -220,7 +222,7 @@ const CardNavigationDailyLogging = () => {
   //   });
   // };
 
-  const handleMeditationChange = (index: number, field: "type" | "duration", value: string | number) => {
+  const handleMeditationChange = (index: number, field: "type" | "duration" | "notes", value: string | number) => {
     setMeditations((currentMeditations) => {
       const updatedMeditations = [...currentMeditations];
       updatedMeditations[index] = { ...updatedMeditations[index], [field]: value };
@@ -347,6 +349,17 @@ const CardNavigationDailyLogging = () => {
               </Tooltip>
             </Grid>
 
+            <TextField
+              label="Additional Comments"
+              multiline
+              rows={4}
+              variant="outlined"
+              fullWidth
+              value={workoutNotes} // Set the TextField's value to the current additionalComments state
+              onChange={(event) => setWorkoutNotes(event.target.value)} // Update the additionalComments state on change
+              sx={{ marginBottom: 0, marginTop: 10 }}
+            />
+
             <Grid container justifyContent="flex-end" sx={{ marginTop: 10 }}> {/* Increased space before this Grid */}
               <Button variant='contained' onClick={handleNext} sx={{ marginTop: 2 }}>Next</Button>
             </Grid>
@@ -398,6 +411,17 @@ const CardNavigationDailyLogging = () => {
                 </Grid>
               </Grid>
 
+              <TextField
+                label="Additional Comments"
+                multiline
+                rows={4}
+                variant="outlined"
+                fullWidth
+                value={sleepNotes} // Set the TextField's value to the current additionalComments state
+                onChange={(event) => setSleepNotes(event.target.value)} // Update the additionalComments state on change
+                sx={{ marginBottom: 0, marginTop: 10 }}
+              />
+
               <Grid container justifyContent="flex-end" sx={{ marginTop: 10 }}>
                 <Button variant='contained' onClick={handleNext}>Next</Button>
               </Grid>
@@ -433,7 +457,7 @@ const CardNavigationDailyLogging = () => {
                   </Select>
                 </FormControl>
 
-                <Grid item xs={12} sx={{ marginTop: 0, marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> {/* Increased space before this Grid */}
+                <Grid item xs={12} sx={{ marginTop: 5, marginBottom: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}> {/* Increased space before this Grid */}
                   <Typography>Meditation Duration:</Typography>
 
                   <Tooltip arrow title="Minus 5 Minutes" placement='top'>
@@ -485,7 +509,16 @@ const CardNavigationDailyLogging = () => {
                   </Tooltip>
 
                 </Grid>
-
+                <TextField
+                  label="Additional Comments"
+                  multiline
+                  rows={4}
+                  variant="outlined"
+                  fullWidth
+                  value={meditations[index].notes} // Set the TextField's value to the current additionalComments state
+                  onChange={(event) => handleMeditationChange(index, 'notes', event.target.value)}
+                  sx={{ marginBottom: 0, marginTop: 5 }}
+                />
               </div>
             ))}
 
