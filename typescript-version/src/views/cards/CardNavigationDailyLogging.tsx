@@ -29,7 +29,7 @@ import workoutTypes from 'src/constants/workoutTypes'
 import axios from 'axios'; // Make sure to install axios if you haven't
 import { IDailyLog, IDailyLogEntry, IMeditation, ISleep, IWorkout, IWorkoutComponent } from 'src/lib/dbTypes'
 
-
+// Daily Entry Interface
 const CardNavigationDailyLogging = () => {
   // KEEPS TRACK OF THE TAB VALUE
   const [tab, setTab] = useState<string>('1');
@@ -89,7 +89,7 @@ const CardNavigationDailyLogging = () => {
 
     const user_id = 1;
     // Create workout part of the data to submit with type IWorkout
-    const workout: IWorkout = {
+    let workout: IWorkout = {
       duration_minutes: workoutDuration,
       notes: "",
       user_id: user_id,
@@ -98,10 +98,15 @@ const CardNavigationDailyLogging = () => {
       updated_at: null,
       id: null,
     };
-    const workoutData: IWorkoutComponent = {
+    // If the user didnt enter any data for the workout (no notes and no types selected), set workout to null
+    let workoutData: IWorkoutComponent | null = {
       workout,
       types: workoutTypesSelected,
     };
+    if (workoutTypesSelected.length === 0 && workoutNotes === "") {
+      workoutData = null;
+    }
+
 
     const sleep: ISleep = {
       duration_hours: sleepDuration,
@@ -150,9 +155,7 @@ const CardNavigationDailyLogging = () => {
 
     // setDialogContent({ title: 'Success', message: 'Your daily entry has been submitted successfully!' });
     // setOpenDialog(true);
-    setDialogContent({ title: 'Error', message: 'Submission failed. Please try again.' });
-    setOpenDialog(true);
-    return;
+
     // Use fetch API to send a POST request to your API endpoint
     try {
       const response = await fetch('/api/submitDailyEntries', {
@@ -241,6 +244,7 @@ const CardNavigationDailyLogging = () => {
   };
 
   const handleCloseDialog = () => {
+    // THIS SHOULD CLOSE THE DIALOG AND REDIRECT TO THE DASHBOARD
     setOpenDialog(false);
   };
 

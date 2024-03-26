@@ -30,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             // Insert workout
             if (workout) {
+                console.log("workout: ", workout);
                 // Assuming workout.notes is optional, provide an empty string if not present
                 const actualWorkoutData = workout.workout;
                 const notes = actualWorkoutData.notes || '';
@@ -39,14 +40,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 console.log("Returned successfully from insertWorkoutAndLinkTypes");
             }
 
-
-
             // Insert sleep
             if (sleep) {
                 await insertSleep(user_id, dailyLogId, sleep.duration_hours, sleep.quality, sleep.notes ? sleep.notes : '');
             }
-
-
 
             // Insert meditations
             if (meditations) {
@@ -57,7 +54,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                     console.log("Successfully inserted meditation: ", meditation.type);
                 }
             }
-
             // Commit the transactionF
             await connection.commit();
             connection.release(); // Release the connection back to the pool

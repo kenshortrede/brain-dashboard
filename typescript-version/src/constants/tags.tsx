@@ -23,7 +23,9 @@ export const languages = [
 ];
 
 export const economics = [
-    'Economics', 'Austrian Economics', 'Keynesianism', 'Anarcho-Capitalism', 'Libertarianism', 'Free Market', 'Capitalism'
+    'Economics', 'Austrian Economics', 'Keynesianism', 'Anarcho-Capitalism', 'Libertarianism',
+    'Free Market', 'Capitalism', 'Ludwig von Mises', 'Murray Rothbard', 'Javier Milei',
+    'Alberto Benegas Lynch', 'Friedrich Hayek', 'Henry Hazlitt', 'Saifedean Ammous'
 ];
 
 export const philosophicalConcepts = [

@@ -1,26 +1,114 @@
-import React, { useState } from 'react';
-import { Autocomplete, Chip, TextField, Button, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Autocomplete, Chip, TextField, Button, CardContent, Typography, Grid, MenuItem, Select, FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import { tagOptions } from 'src/constants/tags';
+import { INoteEntry, INoteSubmission } from 'src/lib/dbTypes';
 
 const NotesPage = () => {
     const [noteCategory, setNoteCategory] = useState('');
     const [noteTitle, setNoteTitle] = useState('');
     const [noteContent, setNoteContent] = useState('');
     const [noteTags, setNoteTags] = useState([]);
+    const [user_id, setUser_id] = useState(1); // Assuming user ID is 1 for now
 
     // Predefined list of tag options for autocomplete suggestions
+    const [tags, setTags] = useState([]); // State to store fetched tags
 
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogContent, setDialogContent] = useState({
+        title: '',
+        message: '',
+    });
 
-    const handleSubmit = () => {
+    useEffect(() => {
+        // Function to fetch tags from the API
+        const fetchTags = async () => {
+            try {
+                const response = await fetch('/api/tags');
+                if (!response.ok) throw new Error('Failed to fetch tags');
+                const data = await response.json();
+                console.log('Fetched tags:', data);
+                setTags(data); // Update state with fetched tags
+            } catch (error) {
+                console.error('Error fetching tags:', error);
+            }
+        };
+
+        fetchTags();
+    }, []); // Empty dependency array means this effect runs once on mount
+
+    const handleSubmit = async () => {
         console.log({
             noteCategory,
             noteTitle,
             noteContent,
             noteTags,
         });
-        // Here you would typically send the note data to your backend or state management solution
+
+        const existingTags = noteTags.filter(tag => typeof tag === 'object').map(tag => tag.id);
+        const newTags = noteTags.filter(tag => typeof tag === 'string');
+
+        const noteSubmissionData: INoteEntry = {
+            tags: existingTags,
+            note: {
+                id: null,
+                user_id: user_id,
+                category: noteCategory as "Other" | "Personal" | "Work" | "Education",
+                title: noteTitle,
+                content: noteContent,
+                created_at: null,
+                updated_at: null
+            }
+        };
+
+        const fullSubmissionData: INoteSubmission = {
+            note: noteSubmissionData,
+            newTags: newTags.length > 0 ? newTags : null
+        }
+
+        // Use fetch API to send a POST request to your API endpoint
+        try {
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(fullSubmissionData),
+            });
+
+            if (response.ok) {
+                // Handle success
+                console.log('Note submitted successfully');
+                // Reset form state
+                setNoteCategory('');
+                setNoteTitle('');
+                setNoteContent('');
+                setNoteTags([]);
+
+                setDialogContent({
+                    title: 'Note Submitted',
+                    message: 'Your note has been submitted successfully!',
+                }); setOpenDialog(true);
+
+
+            } else {
+                // Handle server errors
+                console.error('Submission failed', await response.text());
+
+                setDialogContent({
+                    title: 'Submission Failed',
+                    message: 'Failed to submit your note. Please try again.',
+                });
+                setOpenDialog(true);
+            }
+        } catch (error) {
+            // Handle network errors
+            console.error('Error submitting note', error);
+        }
     };
 
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
     return (
         <CardContent>
             <Typography variant='h5' sx={{ marginBottom: 2 }}>
@@ -56,15 +144,16 @@ const NotesPage = () => {
                     <Autocomplete
                         multiple
                         id="tags-standard"
-                        options={tagOptions}
+                        options={tags}
+                        getOptionLabel={(option) => option.tag || option}
                         freeSolo
                         value={noteTags}
                         onChange={(event, newValue) => {
-                            setNoteTags([...newValue]);
+                            setNoteTags(newValue);
                         }}
                         renderTags={(value, getTagProps) =>
                             value.map((option, index) => (
-                                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                                <Chip variant="outlined" label={typeof option === 'object' ? option.tag : option} {...getTagProps({ index })} />
                             ))
                         }
                         renderInput={(params) => (
@@ -92,6 +181,22 @@ const NotesPage = () => {
                     <Button variant='contained' onClick={handleSubmit}>Save Note</Button>
                 </Grid>
             </Grid>
+            <Dialog
+                open={openDialog}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{dialogContent.title}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        {dialogContent.message}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </CardContent>
     );
 };

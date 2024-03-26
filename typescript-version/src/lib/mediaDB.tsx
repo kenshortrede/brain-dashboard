@@ -1,12 +1,19 @@
 import db from './db';
+import { IMedia } from './dbTypes';
 
-export const insertMedia = async (userId: number, title: string, type: string, status: string, rating: number, comments: string) => {
-    const query = `
-        INSERT INTO media (user_id, title, type, status, rating, comments)
-        VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    const [result] = await db.execute(query, [userId, title, type, status, rating, comments]);
-    return result;
+
+export const insertMedia = async (media: IMedia) => {
+    try {
+        const { user_id, title, type, status, rating, comments, author } = media;
+        const query = `
+            INSERT INTO media (user_id, title, type, status, rating, comments, author)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        const [result] = await db.execute(query, [user_id, title, type, status, rating || null, comments || null, author || null]);
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 export const updateMedia = async (mediaId: number, updates: { title?: string; type?: string; status?: string; rating?: number; comments?: string }) => {

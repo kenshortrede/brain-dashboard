@@ -15,15 +15,16 @@ export interface IDailyLog {
 }
 
 export interface IMedia {
-    id: number;
+    id: number | null;
     user_id: number;
     title: string;
     type: 'Book' | 'Movie' | 'Video' | 'Podcast';
     status: 'Planned' | 'In Progress' | 'Completed';
+    author: string | null;
     rating: number | null;
     comments: string | null;
-    created_at: Date;
-    updated_at: Date;
+    created_at: Date | null;
+    updated_at: Date | null;
 }
 
 export interface IMediaTag {
@@ -43,14 +44,23 @@ export interface IMeditation {
     daily_logs_id: number | null;
 }
 
+export interface INoteSubmission {
+    note: INoteEntry;
+    newTags: string[] | null;
+}
+
+export interface INoteEntry {
+    note: INote;
+    tags: number[];
+}
 export interface INote {
-    id: number;
+    id: number | null;
     user_id: number;
     category: 'Personal' | 'Work' | 'Education' | 'Other';
-    title: string;
-    content: string;
-    created_at: Date;
-    updated_at: Date;
+    title: string | null;
+    content: string | null;
+    created_at: Date | null;
+    updated_at: Date | null;
 }
 
 export interface INoteTag {

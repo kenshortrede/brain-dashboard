@@ -1,12 +1,17 @@
 import db from './db';
+import { INote, INoteEntry } from './dbTypes';
 
-export const insertNote = async (userId: number, category: string, title: string, content: string) => {
-    const query = `
+export const insertNote = async (note: INoteEntry) => {
+    try {
+        const query = `
         INSERT INTO notes (user_id, category, title, content)
         VALUES (?, ?, ?, ?)
     `;
-    const [result] = await db.execute(query, [userId, category, title, content]);
-    return result;
+        const [result] = await db.execute(query, [note.note.user_id, note.note.category, note.note.title, note.note.content]);
+        return result;
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 export const updateNote = async (noteId: number, updates: { category?: string; title?: string; content?: string }) => {
@@ -45,12 +50,18 @@ export const deleteNote = async (noteId: number) => {
 };
 
 export const linkNoteAndTag = async (noteId: number, tagId: number) => {
-    const query = `
+    try {
+        const query = `
         INSERT INTO note_tags (note_id, tag_id)
         VALUES (?, ?)
     `;
-    const [result] = await db.execute(query, [noteId, tagId]);
-    return result;
+        console.log("noteId: ", noteId, "tagId: ", tagId);
+        const [result] = await db.execute(query, [noteId, tagId]);
+        console.log("Result: ", result);
+        return result;
+    } catch (error) {
+        console.error("[linkNoteAndTag]", error);
+    }
 };
 
 export const unlinkNoteAndTag = async (noteId: number, tagId: number) => {
@@ -60,4 +71,23 @@ export const unlinkNoteAndTag = async (noteId: number, tagId: number) => {
     `;
     const [result] = await db.execute(query, [noteId, tagId]);
     return result;
+};
+
+// Select all notes
+export const getAllNotes = async () => {
+    const query = `
+        SELECT * FROM notes
+    `;
+    const [rows] = await db.execute(query);
+    return rows;
+};
+
+// Select note by ID
+export const getNoteById = async (noteId: number) => {
+    const query = `
+        SELECT * FROM notes
+        WHERE id = ?
+    `;
+    const [rows] = await db.execute(query, [noteId]);
+    return rows;
 };
