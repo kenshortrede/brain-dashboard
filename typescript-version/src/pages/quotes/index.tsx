@@ -27,12 +27,10 @@ import { TabPanel } from '@mui/lab'
 import { Autocomplete, Chip, Button, CardContent, Checkbox, FormControlLabel, FormGroup, Slider, TextField, Typography, AutocompleteChangeReason } from '@mui/material'
 import { tagOptions } from 'src/constants/tags';
 import { useEffect, useState } from 'react'
+import { IQuote, IQuoteSubmission } from 'src/lib/dbTypes'
 
-// Example authors list - replace this with your dynamic list fetched from the database
-const authorsList = ['Mark Twain', 'Virginia Woolf', 'Albert Einstein', 'Maya Angelou'];
 
 const Quotes = () => {
-    console.log("Daily.tsx")
 
     // Predefined list of tag options for autocomplete suggestions
     const [tags, setTags] = useState([]); // State to store fetched tags
@@ -42,7 +40,7 @@ const Quotes = () => {
     const [quoteTags, setQuoteTags] = useState([]);
     const [quote, setQuote] = useState('');
     // const [author, setAuthor] = useState(null); // Use null for Autocomplete's value to represent no selection
-    const [author, setAuthor] = useState({ id: null, name: '' });
+    const [author, setAuthor] = useState({ id: null, tag: '', category: '' });
 
     useEffect(() => {
         // Function to fetch tags from the API
@@ -51,7 +49,6 @@ const Quotes = () => {
                 const response = await fetch('/api/tags');
                 if (!response.ok) throw new Error('Failed to fetch tags');
                 const data = await response.json();
-                console.log('Fetched tags:', data);
                 setTags(data); // Update state with fetched tags
             } catch (error) {
                 console.error('Error fetching tags:', error);
@@ -60,26 +57,10 @@ const Quotes = () => {
 
         // Fetch Authors
         const fetchAuthors = async () => {
-            const fakeListOfAuthors = [{
-                id: 1,
-                name: 'Mark Twain',
-            }, {
-                id: 2,
-                name: 'Virginia Woolf',
-            }, {
-                id: 3,
-                name: 'Albert Einstein',
-            }, {
-                id: 4,
-                name: 'Maya Angelou',
-            }];
-            setAuthors(fakeListOfAuthors);
-            return;
             try {
                 const response = await fetch('/api/authors');
                 if (!response.ok) throw new Error('Failed to fetch authors');
                 const data = await response.json();
-                console.log('Fetched authors:', data);
                 setAuthors(data); // Update state with fetched authors
             } catch (error) {
                 console.error('Error fetching authors:', error);
@@ -92,14 +73,36 @@ const Quotes = () => {
 
     const handleSubmit = () => {
         console.log("Quote:", quote, "Author:", author, "Tags:", quoteTags);
-        return;
-        // Handle the submission, e.g., sending data to your backend
-    };
-    // const handleDeleteAuthor = () => {
-    //     setAuthor(null);
-    // };
-    const handleDeleteAuthor = () => {
-        setAuthor({ id: null, name: '' });
+
+        // Handle the submission, e.g., sending data to your backend /api/quotes POST endpoint
+        const quoteData: IQuote = {
+            content: quote,
+            author: author,
+            id: null,
+            created_at: null,
+            updated_at: null,
+            user_id: 1
+        }
+        const finalData: IQuoteSubmission = {
+            quote: quoteData,
+            tags: quoteTags.map(tag => tag.id)
+        }
+
+        console.log("Final Data:", finalData);
+        fetch('/api/quotes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(finalData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     };
 
     return (
@@ -120,33 +123,34 @@ const Quotes = () => {
             <Autocomplete
                 freeSolo
                 options={authors}
-                getOptionLabel={(option) => option.name || ''}
-                value={author.name ? author : null} // Ensure the value is null when author.name is empty to reset the Autocomplete
+                getOptionLabel={(option) => option.tag || ''}
+                value={author}
                 onInputChange={(event, newInputValue, reason) => {
-                    // Only update the author name on manual input
-                    // if (reason === 'input') setAuthor((prev) => ({ ...prev, name: newInputValue }));
-                    if (reason === 'input') setAuthor(() => ({ id: null, name: newInputValue }));
+                    // Only update the author tag on manual input, reset id to null for new inputs
+                    if (reason === 'input') {
+                        setAuthor({ id: null, tag: newInputValue });
+                    }
                 }}
-                onChange={(event, newValue, reason: AutocompleteChangeReason) => {
+                onChange={(event, newValue, reason) => {
                     // Directly set the author state to the selected option or reset if cleared
                     if (reason === 'selectOption' && typeof newValue === 'object') {
                         setAuthor(newValue);
                     } else if (reason === 'clear') {
-                        setAuthor({ id: null, name: '' });
+                        setAuthor({ id: null, tag: '' });
                     }
                 }}
                 renderInput={(params) => (
                     <TextField {...params} label="Author" variant="outlined" fullWidth />
                 )}
-                renderOption={(props, option) => <li {...props} key={option.id}>{option.name}</li>}
-                isOptionEqualToValue={(option, value) => option.name === value.name}
-                inputValue={author.name || ''} // Control the input value to match the author name
+                renderOption={(props, option) => <li {...props} key={option.id}>{option.tag}</li>}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                inputValue={author.tag || ''} // Control the input value to match the author tag
                 sx={{ marginBottom: 2 }}
             />
-            {author.name && (
+            {author.tag && (
                 <Chip
-                    label={author.name}
-                    onDelete={() => setAuthor({ id: null, name: '' })}
+                    label={author.tag}
+                    onDelete={() => setAuthor({ id: null, tag: '' })}
                     color="primary"
                     sx={{ marginBottom: 2 }}
                 />
@@ -184,8 +188,9 @@ const Quotes = () => {
                 <Autocomplete
                     multiple
                     id="tags-standard"
-                    options={tags}
-                    getOptionLabel={(option) => option.tag || option}
+                    // options={tags}
+                    options={tags.filter(option => option.tag !== author.tag)} // Filter out the author tag from options
+                    getOptionLabel={(option) => option.tag || ''}
                     freeSolo
                     value={quoteTags}
                     onChange={(event, newValue) => {

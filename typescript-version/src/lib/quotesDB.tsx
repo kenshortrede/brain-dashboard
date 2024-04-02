@@ -61,3 +61,34 @@ export const unlinkQuoteAndTag = async (quoteId: number, tagId: number) => {
     const [result] = await db.execute(query, [quoteId, tagId]);
     return result;
 };
+
+export const getAuthors = async () => {
+    const query = `
+        SELECT id, tag from tags
+        WHERE category = 'Authors & Influential Figures'
+    `;
+    const [authors] = await db.execute(query);
+    console.log(authors);
+    return authors;
+}
+
+// Get all quotes for user
+export const getQuotes = async (userId: number) => {
+    const query = `
+        SELECT 
+        quotes.id, 
+        content, 
+        author, 
+        created_at, 
+        updated_at, 
+        GROUP_CONCAT(tags.tag SEPARATOR ', ') AS tags
+    FROM quotes
+    LEFT JOIN quote_tags ON quotes.id = quote_tags.quote_id
+    LEFT JOIN tags ON quote_tags.tag_id = tags.id
+    WHERE user_id = ?
+    GROUP BY quotes.id, content, author, created_at, updated_at
+    `;
+    const [quotes] = await db.execute(query, [userId]);
+    console.log(quotes.length);
+    return quotes;
+};

@@ -26,6 +26,33 @@ export const insertTag = async (tag: string) => {
     }
 };
 
+// Insert Tag with tag and category
+export const insertTagWithCategory = async (tag: string, category: string) => {
+    console.log('Inserting tag:', tag);
+    if (!tag) {
+        throw new Error('Tag cannot be empty');
+    }
+    try {
+        // Check if the tag already exists to avoid duplicates
+        const checkQuery = `SELECT id FROM tags WHERE tag = ?`;
+        const [existing] = await db.execute(checkQuery, [tag]);
+        console.log("Existing: ", existing);
+        if (existing.length > 0) {
+            // Return existing tag ID if it already exists
+            return existing[0];
+        }
+        console.log("Got here");
+        // Insert new tag if it doesn't exist
+        const insertQuery = `INSERT INTO tags (tag, category) VALUES (?, ?)`;
+        const [insertResult] = await db.execute(insertQuery, [tag, category]);
+        const newTagId = insertResult.insertId; // Assuming insertId is available in the result
+        console.log("Got here...", newTagId);
+        return { id: newTagId }; // Return the new tag ID in a similar format for consistency
+    } catch (error) {
+        console.error('Failed to insert tag:', error);
+    }
+};
+
 export const getTagById = async (id: number) => {
     const query = `
         SELECT * FROM tags WHERE id = ?

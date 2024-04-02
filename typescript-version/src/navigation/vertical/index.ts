@@ -57,7 +57,11 @@ const navigation = (): VerticalNavItemsType => {
     {
       sectionTitle: 'Data'
     },
-
+    {
+      title: 'Quotes',
+      icon: Bookshelf,
+      path: '/quotes/read'
+    },
 
     //------------------------------------------------------------------------------------
     {

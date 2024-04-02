@@ -18,7 +18,7 @@ export interface IMedia {
     id: number | null;
     user_id: number;
     title: string;
-    type: 'Book' | 'Movie' | 'Video' | 'Podcast';
+    type: 'Book' | 'Movie' | 'Video' | 'Podcast' | 'Article';
     status: 'Planned' | 'In Progress' | 'Completed';
     author: string | null;
     rating: number | null;
@@ -68,13 +68,17 @@ export interface INoteTag {
     tag_id: number;
 }
 
+export interface IQuoteSubmission {
+    quote: IQuote;
+    tags: number[];
+}
 export interface IQuote {
-    id: number;
+    id: number | null;
     user_id: number;
     content: string;
-    author: string | null;
-    created_at: Date;
-    updated_at: Date;
+    author: ITag | null;
+    created_at: Date | null;
+    updated_at: Date | null;
 }
 
 export interface IQuoteTag {
@@ -94,8 +98,9 @@ export interface ISleep {
 }
 
 export interface ITag {
-    id: number;
+    id: number | null;
     tag: string;
+    category: string | null;
 }
 
 export interface IUser {

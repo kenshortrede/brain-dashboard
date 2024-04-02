@@ -25,7 +25,6 @@ import CardNavigationCenter from 'src/views/cards/CardNavigationCenter'
 import CardNavigationDailyLogging from 'src/views/cards/CardNavigationDailyLogging'
 
 const Daily = () => {
-  console.log("Daily.tsx")
   return (
     <ApexChartWrapper>
       <Grid container spacing={6}>
@@ -36,9 +35,9 @@ const Daily = () => {
           <StatisticsCard />
         </Grid> */}
         <Grid item xs={12} md={6}>
-        <CardNavigationDailyLogging />
-      </Grid>
-        
+          <CardNavigationDailyLogging />
+        </Grid>
+
         <Grid item xs={12} md={6} lg={4}>
           <Grid container spacing={6}>
             <Grid item xs={6}>
@@ -85,7 +84,7 @@ const Daily = () => {
             </Grid>
           </Grid>
         </Grid>
-        
+
       </Grid>
     </ApexChartWrapper>
   )

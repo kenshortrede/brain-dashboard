@@ -22,7 +22,7 @@ const Media = () => {
     const handleSubmit = async () => {
         const mediaData: IMedia = {
             user_id: user_id,
-            type: mediaType as 'Book' | 'Movie' | 'Video' | 'Podcast',
+            type: mediaType as 'Book' | 'Movie' | 'Video' | 'Podcast' | 'Article',
             status: status as 'Planned' | 'In Progress' | 'Completed',
             rating,
             title,
@@ -89,7 +89,7 @@ const Media = () => {
                             label="Type"
                             onChange={(e) => setMediaType(e.target.value)}
                         >
-                            {['Book', 'Movie', 'Video', 'Podcast'].map((type) => (
+                            {['Book', 'Movie', 'Video', 'Podcast', 'Article'].map((type) => (
                                 <MenuItem value={type} key={type}>{type}</MenuItem>
                             ))}
                         </Select>

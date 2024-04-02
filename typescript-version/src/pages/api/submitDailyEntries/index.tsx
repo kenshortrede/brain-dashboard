@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 // Import the necessary interfaces from dbTypes.tsx
-import { IDailyLog, IWorkout, ISleep, IMeditation, IDailyLogEntry } from '../../lib/dbTypes';
-import { insertDailyLog } from '../../lib/dailyLogsDB';
-import { insertWorkout, insertWorkoutAndLinkTypes, linkWorkoutAndType } from '../../lib/workoutsDB';
-import { insertSleep } from '../../lib/sleepDB';
-import { insertMeditation } from '../../lib/meditationsDB';
+import { IDailyLog, IWorkout, ISleep, IMeditation, IDailyLogEntry } from '../../../lib/dbTypes';
+import { insertDailyLog } from '../../../lib/dailyLogsDB';
+import { insertWorkout, insertWorkoutAndLinkTypes, linkWorkoutAndType } from '../../../lib/workoutsDB';
+import { insertSleep } from '../../../lib/sleepDB';
+import { insertMeditation } from '../../../lib/meditationsDB';
 // Import other necessary DB interaction functions
-import pool from '../../lib/db';
+import pool from '../../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'POST') {

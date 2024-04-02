@@ -1,6 +1,6 @@
 // pages/api/tags.tsx
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAllTags } from '../../lib/tagsDB'; // Adjust the import path based on your project structure
+import { getAllTags } from '../../../lib/tagsDB'; // Adjust the import path based on your project structure
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
